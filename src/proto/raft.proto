@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package sweetopia.raft;
+import "google/protobuf/empty.proto";
+option java_package = "com.sweetopia.raft";
+
+
+service RaftService {
+
+  rpc Put(PutRequest) returns (PutResponse);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+  rpc RequestVote(VoteRequest) returns (VoteResponse);
+  rpc AppendLog(LogEntry) returns (google.protobuf.Empty);
+  rpc AppendEntries(AppendEntriesRequest) returns (AppendEntriesResponse);
+}
+
+message PutRequest {
+  string key = 1;
+  string value = 2;
+}
+
+message PutResponse {
+  bool success = 1;
+}
+
+message GetRequest {
+  string key = 1;
+}
+
+message GetResponse {
+  string value = 1;
+  bool found = 2;
+}
+
+message HeartbeatRequest {
+  string leader_id = 1;
+  int32 term = 2;
+}
+
+message HeartbeatResponse {
+  bool success = 1;
+}
+
+message VoteRequest {
+  string candidate_id = 1;
+  int32 term = 2;
+}
+
+message VoteResponse {
+  int32 term = 1;
+  bool vote_granted = 2;
+}
+
+message AppendEntriesRequest {
+  int32 term = 1;
+  string leaderId = 2;
+  int32 prevLogIndex = 3;
+  int32 prevLogTerm = 4;
+  repeated LogEntry entries = 5;
+  int32 leaderCommit = 6;
+}
+
+message AppendEntriesResponse {
+  int32 term = 1;
+  bool success = 2;
+}
+
+message LogEntry {
+  string command = 1;  // Command to be executed
+  int32 term = 2;  // Term in which the entry was created
+  int32 index = 3;  // Index of the log entry
+}
+
+
