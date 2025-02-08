@@ -11,7 +11,6 @@ public class LogEntry {
         this.index = index;
     }
 
-    // Getters
     public String getCommand() {
         return command;
     }

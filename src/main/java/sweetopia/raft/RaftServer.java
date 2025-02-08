@@ -76,7 +76,7 @@ public class RaftServer extends RaftServiceGrpc.RaftServiceImplBase {
         if (currentTerm < request.getTerm()) {
             currentTerm = request.getTerm();
             state = NodeState.FOLLOWER;
-            votedFor = null;  // reset vote as the term has advanced
+            votedFor = null;
         }
 
         currentLeader = request.getLeaderId();
@@ -166,7 +166,7 @@ public class RaftServer extends RaftServiceGrpc.RaftServiceImplBase {
     }
 
     private void sendVoteRequest(String peer, Raft.VoteRequest voteRequest) {
-        // Create the channel to the peer node
+
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", getPeerPort(peer))
                 .usePlaintext()
                 .build();
@@ -244,7 +244,7 @@ public class RaftServer extends RaftServiceGrpc.RaftServiceImplBase {
             public void run() {
                 sendHeartbeats();
             }
-        }, 0, 1000);  // Send heartbeats every 1 second
+        }, 0, 1000);
     }
 
     private void sendHeartbeats() {
@@ -261,16 +261,15 @@ public class RaftServer extends RaftServiceGrpc.RaftServiceImplBase {
     }
 
     private void sendHeartbeatToPeer(String peer, Raft.HeartbeatRequest heartbeatRequest) {
-        // Create the channel to the peer node
+
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", getPeerPort(peer))
                 .usePlaintext()
                 .build();
 
-        // Create a stub for the remote procedure call (RPC)
+
         RaftServiceGrpc.RaftServiceBlockingStub blockingStub = RaftServiceGrpc.newBlockingStub(channel);
 
         try {
-            // Send the heartbeat request to the peer node
             Raft.HeartbeatResponse response = blockingStub.heartbeat(heartbeatRequest);
 
             if (response.getSuccess()) {
@@ -281,7 +280,6 @@ public class RaftServer extends RaftServiceGrpc.RaftServiceImplBase {
         } catch (Exception e) {
             System.err.println("Error contacting peer " + peer + ": " + e.getMessage());
         } finally {
-            // Always shut down the channel to avoid memory leaks
             channel.shutdownNow();
         }
     }
@@ -302,7 +300,7 @@ public class RaftServer extends RaftServiceGrpc.RaftServiceImplBase {
             case "node3":
                 return 50053;
             default:
-                return 50051; // Default port in case no match is found
+                return 50051;
         }
     }
 }
